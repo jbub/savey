@@ -1,5 +1,7 @@
 # Savey
 
+[![Build Status](https://travis-ci.org/jbub/savey.svg)](https://travis-ci.org/jbub/savey)
+
 Export data from your favourite money management tool http://www.savey.co/.
 
 ## Install
