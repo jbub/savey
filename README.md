@@ -34,21 +34,27 @@ func checkErr(err error) {
 }
 
 func main() {
+    // create new savey client with default HTTP client
 	client, err := savey.NewClient(nil)
 	checkErr(err)
-
+    
+    // login user using username and password
 	err = client.Login(userLogin, userPassword)
 	checkErr(err)
-
+    
+    // list payment accounts of current user
 	accounts, err := client.Accounts.GetAccounts()
 	checkErr(err)
-
+    
+    // list categories of current user
 	categories, err := client.Categories.GetCategories()
 	checkErr(err)
-
+    
+    // list all transactions for given accounts of current user
 	transactions, err := client.Transactions.GetTransactions(accounts)
 	checkErr(err)
-
+    
+    // logout user
 	err = client.Logout()
 	checkErr(err)
 }
