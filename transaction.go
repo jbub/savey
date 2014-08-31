@@ -68,13 +68,14 @@ func ParseTransactions(acc Account, resp *http.Response) ([]Transaction, error) 
 	}
 	transactions := []Transaction{}
 	var transErr interface{}
-	doc.Find(".section.group.list").EachWithBreak(func(i int, s *goquery.Selection) {
+	doc.Find(".section.group.list").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		trans, err := ParseTransaction(acc, s)
 		if err != nil {
 			transErr = err
 			return false
 		}
 		transactions = append(transactions, *trans)
+		return true
 	})
 	if transErr != nil {
 		return nil, transErr.(error)

@@ -41,13 +41,14 @@ func ParseAccounts(resp *http.Response) ([]Account, error) {
 	}
 	accounts := []Account{}
 	var accErr interface{}
-	doc.Find(".setup-accounts .section.group").Not(".setup-heading").EachWithBreak(func(i int, s *goquery.Selection) {
+	doc.Find(".setup-accounts .section.group").Not(".setup-heading").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		acc, err := ParseAccount(s)
 		if err != nil {
 			accErr = err
 			return false
 		}
 		accounts = append(accounts, *acc)
+		return true
 	})
 	if accErr != nil {
 		return nil, accErr.(error)

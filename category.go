@@ -41,13 +41,14 @@ func ParseCategories(resp *http.Response) ([]Category, error) {
 	}
 	categories := []Category{}
 	var catErr interface{}
-	doc.Find(".setup-categories .section.group").Not(".setup-heading").EachWithBreak(func(i int, s *goquery.Selection) {
+	doc.Find(".setup-categories .section.group").Not(".setup-heading").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		cat, err := ParseCategory(s)
 		if err != nil {
 			catErr = err
 			return false
 		}
 		categories = append(categories, *cat)
+		return true
 	})
 	if catErr != nil {
 		return nil, catErr.(error)
