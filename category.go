@@ -2,7 +2,6 @@ package savey
 
 import (
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
@@ -41,13 +40,18 @@ func ParseCategories(resp *http.Response) ([]Category, error) {
 		return nil, err
 	}
 	categories := []Category{}
-	doc.Find(".setup-categories .section.group").Not(".setup-heading").Each(func(i int, s *goquery.Selection) {
+	var catErr interface{}
+	doc.Find(".setup-categories .section.group").Not(".setup-heading").EachWithBreak(func(i int, s *goquery.Selection) {
 		cat, err := ParseCategory(s)
 		if err != nil {
-			log.Fatal(err)
+			catErr = err
+			return false
 		}
 		categories = append(categories, *cat)
 	})
+	if catErr != nil {
+		return nil, catErr.(error)
+	}
 	return categories, nil
 }
 

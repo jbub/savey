@@ -3,7 +3,6 @@ package savey
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -68,13 +67,18 @@ func ParseTransactions(acc Account, resp *http.Response) ([]Transaction, error) 
 		return nil, err
 	}
 	transactions := []Transaction{}
-	doc.Find(".section.group.list").Each(func(i int, s *goquery.Selection) {
+	var transErr interface{}
+	doc.Find(".section.group.list").EachWithBreak(func(i int, s *goquery.Selection) {
 		trans, err := ParseTransaction(acc, s)
 		if err != nil {
-			log.Fatal(err)
+			transErr = err
+			return false
 		}
 		transactions = append(transactions, *trans)
 	})
+	if transErr != nil {
+		return nil, transErr.(error)
+	}
 	return transactions, nil
 }
 

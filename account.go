@@ -2,7 +2,6 @@ package savey
 
 import (
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
@@ -41,13 +40,18 @@ func ParseAccounts(resp *http.Response) ([]Account, error) {
 		return nil, err
 	}
 	accounts := []Account{}
-	doc.Find(".setup-accounts .section.group").Not(".setup-heading").Each(func(i int, s *goquery.Selection) {
+	var accErr interface{}
+	doc.Find(".setup-accounts .section.group").Not(".setup-heading").EachWithBreak(func(i int, s *goquery.Selection) {
 		acc, err := ParseAccount(s)
 		if err != nil {
-			log.Fatal(err)
+			accErr = err
+			return false
 		}
 		accounts = append(accounts, *acc)
 	})
+	if accErr != nil {
+		return nil, accErr.(error)
+	}
 	return accounts, nil
 }
 
