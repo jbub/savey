@@ -26,23 +26,26 @@ func (s *AccountService) GetAccounts() ([]Account, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	resp, err := s.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAccounts(resp)
+	return parseAccounts(resp)
 }
 
-// ParseAccounts parses accounts from HTTP response.
-func ParseAccounts(resp *http.Response) ([]Account, error) {
+// parseAccounts parses accounts from HTTP response.
+func parseAccounts(resp *http.Response) ([]Account, error) {
 	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
 		return nil, err
 	}
+
 	accounts := []Account{}
 	var accErr interface{}
+
 	doc.Find(".setup-accounts .section.group").Not(".setup-heading").EachWithBreak(func(i int, s *goquery.Selection) bool {
-		acc, err := ParseAccount(s)
+		acc, err := parseAccount(s)
 		if err != nil {
 			accErr = err
 			return false
@@ -50,28 +53,32 @@ func ParseAccounts(resp *http.Response) ([]Account, error) {
 		accounts = append(accounts, *acc)
 		return true
 	})
+
 	if accErr != nil {
 		return nil, accErr.(error)
 	}
 	return accounts, nil
 }
 
-// ParseAccount parses account from selection.
-func ParseAccount(s *goquery.Selection) (*Account, error) {
+// parseAccount parses account from selection.
+func parseAccount(s *goquery.Selection) (*Account, error) {
 	title := s.Find(".col.span_6_of_12").Text()
 	currency := s.Find(".col.span_2_of_12").Text()
+
 	attr, exists := s.Find(".col.span_3_of_12 a").Eq(0).Attr("onclick")
 	if !exists {
 		return nil, errors.New("Account id attr not found.")
 	}
-	id, err := ParseID(attr)
+
+	id, err := parseID(attr)
 	if err != nil {
 		return nil, err
 	}
+
 	acc := &Account{
 		ID:       id,
-		Title:    CleanString(title),
-		Currency: CleanString(currency),
+		Title:    cleanString(title),
+		Currency: cleanString(currency),
 	}
 	return acc, nil
 }

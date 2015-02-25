@@ -115,6 +115,7 @@ func (c *Client) Login(username string, password string) error {
 		"credential": {password},
 	}
 	url := "user/login"
+
 	req, err := c.Post(url, payload)
 	if err != nil {
 		return err
